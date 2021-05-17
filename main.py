@@ -9,7 +9,7 @@ headers = {
     "accept-language": "en-US,en;q=0.9,fr;q=0.8",
     "cache-control": "max-age=0",
     "upgrade-insecure-requests": "1",
-    "cookie": "AmeliDirectPersist=745595191.36895.0000; cookieconsent_dismissed=yes; infosoins=fltdpsc21lg64n4g880lpj3785; TS01b76c1f=0139dce0d28ca24912917a29a07354e23e583ea3bd2aeb0a9a00d850dc64b079afbc3b282195e55e83746cd7c4ab0b90d1acbfc74c"
+    "cookie": "AmeliDirectPersist=745595191.36895.0000; cookieconsent_dismissed=yes; infosoins=tke43dsp2d8g3blq4alejqde64; TS01b76c1f=0139dce0d29a98c5a1421e367b20ad53e0e692516614e3517a8d2e2acaeed54964153dfa73c0d8b950a3528c362f0df658d90a4e7c"
   }
 page = requests.get(URL, headers=headers)
 soup = BeautifulSoup(page.content, 'html.parser')
@@ -20,14 +20,17 @@ tmps = soup.find_all('div', class_="item-professionnel")
 
 for e in tmps:
     print('---------------------------')
-    # e.div = ['index', 'content']
-    print(json.dumps(xmltodict.parse(str(e))))
-    # print(json.dumps(xmltodict.parse(e)))
+    e.div.unwrap()
+    mystr = json.dumps(xmltodict.parse(str(e)))
+    res = json.loads(mystr)
+    tata = res.items()
+    print(tata.get('h2'))
+    # print(tata)
+    # print(res)
+    # print(e)
     print("============")
-    print(type(e))
+    print(type(tata))
     print('--------------------------')
 
 # print(soup.prettify())
 #print(results)
-
-
