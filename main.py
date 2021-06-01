@@ -18,25 +18,14 @@ page = requests.get(URL, headers=headers)
 # page = requests.get(URL)
 soup = BeautifulSoup(page.content, 'html.parser')
 
-print(soup)
-tmps = soup.find_all('div', class_="item-professionnel")
+# print(soup)
+nameAdress = soup.find_all('div', class_="item-professionnel")
 
-
-for e in tmps:
-    print('---------------------------')
+for e in nameAdress:
     e.div.unwrap()
     mystr = json.dumps(xmltodict.parse(str(e)))
     res = json.loads(mystr)
-    # tata = res.items()
-    # nom + prenom = res.get('div').get('div')[0].get('h2')
-    nom = res.get('div').get('div')[0].get('h2').get('a').get('strong')
-    prenom = res.get('div').get('div')[0].get('h2').get('a').get('#text')
-    print(res.get('div').get('div')[2])
-    # print(res)
-    # print(e)
-    print("============")
-    # print(type(tata))
-    print('--------------------------')
+    firstName = res.get('div').get('div')[0].get('h2').get('a').get('strong')
+    lastName = res.get('div').get('div')[0].get('h2').get('a').get('#text')
+    adress = res.get('div').get('div')[2].get('div').pop(6).get('#text'))
 
-# print(soup.prettify())
-#print(results)
