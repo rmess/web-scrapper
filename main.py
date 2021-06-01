@@ -29,9 +29,9 @@ for e in nameAddress:
     e.div.unwrap()
     mystr = json.dumps(xmltodict.parse(str(e)))
     res = json.loads(mystr)
-    firstName = res.get('div').get('div')[0].get('h2').get('a').get('strong')
-    lastName = res.get('div').get('div')[0].get('h2').get('a').get('#text')
-    address = res.get('div').get('div')[2].get('div').pop(6).get('#text')
+    firstName = res.get('div').get('div')[0].get('h2').get('a').get('strong') or "Null"
+    lastName = res.get('div').get('div')[0].get('h2').get('a').get('#text') or "Null"
+    address = res.get('div').get('div')[2].get('div').pop(6).get('#text') or "Null"
     phone = res.get('div').get('div')[2].get('div').pop(3).get('#text') or "Null"
     print(phone)
     print('=============')
