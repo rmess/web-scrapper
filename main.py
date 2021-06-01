@@ -19,13 +19,20 @@ page = requests.get(URL, headers=headers)
 soup = BeautifulSoup(page.content, 'html.parser')
 
 # print(soup)
-nameAdress = soup.find_all('div', class_="item-professionnel")
+phone = soup.find_all('div', class_="item left tel")
+nameAddress = soup.find_all('div', class_="item-professionnel")
 
-for e in nameAdress:
+
+for e in nameAddress:
+    print('=============')
+    print('=============')
     e.div.unwrap()
     mystr = json.dumps(xmltodict.parse(str(e)))
     res = json.loads(mystr)
     firstName = res.get('div').get('div')[0].get('h2').get('a').get('strong')
     lastName = res.get('div').get('div')[0].get('h2').get('a').get('#text')
-    adress = res.get('div').get('div')[2].get('div').pop(6).get('#text'))
+    address = res.get('div').get('div')[2].get('div').pop(6).get('#text')
+    phone = res.get('div').get('div')[2].get('div').pop(3).get('#text') or "Null"
+    print(phone)
+    print('=============')
 
