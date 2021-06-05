@@ -43,35 +43,39 @@ soup = BeautifulSoup(page.content, 'html.parser')
 # print(soup)
 nameAddress = soup.find_all('div', class_="item-professionnel")
 doctorList = []
-doctorList.append(["Nom", "Prénom", "Addresse", "Téléphone"])
+# doctorList.append(["Nom", "Prénom", "Addresse", "Téléphone"])
 
 
 # print("debut")
 # print(doctorList)
-with open('doctorDb.csv') as file:
+with open('doctorDb.csv','r') as file:
     reader = csv.DictReader(file)
     for row in reader:
-        print(row)
+        # print(row)
         doctorList.append(row)
 print("fin")
 print(doctorList)
 
-# with open('doctorDb.csv', 'a+') as file:
-#     writer = csv.writer(file)
-#     print(doctorList)
-#     for e in nameAddress:
-#         print('=============')
-#         e.div.unwrap()
-#         mystr = json.dumps(xmltodict.parse(str(e)))
-#         res = json.loads(mystr)
-#         firstName = res.get('div').get('div')[0].get('h2').get('a').get('strong') or "Null"
-#         lastName = res.get('div').get('div')[0].get('h2').get('a').get('#text') or "Null"
-#         address = res.get('div').get('div')[2].get('div').pop(6).get('#text') or "Null"
-#         phone = res.get('div').get('div')[2].get('div').pop(3).get('#text') or "Null"
-#         doctorList.append([firstName, lastName, address, phone])
-#         print(firstName)
-#         print(lastName)
-#         print(address)
-#         print(phone)
-#         print('=============')
-#     writer.writerows(doctorList)
+with open('doctorDb.csv', 'a+') as file:
+    writer = csv.writer(file)
+    print(doctorList)
+    for e in nameAddress:
+        print('=============')
+        e.div.unwrap()
+        mystr = json.dumps(xmltodict.parse(str(e)))
+        res = json.loads(mystr)
+        firstName = res.get('div').get('div')[0].get('h2').get('a').get('strong') or "Null"
+        lastName = res.get('div').get('div')[0].get('h2').get('a').get('#text') or "Null"
+        address = res.get('div').get('div')[2].get('div').pop(6).get('#text') or "Null"
+        phone = res.get('div').get('div')[2].get('div').pop(3).get('#text') or "Null"
+        currentRow = [firstName, lastName, address, phone]
+        if (doctorList.count(currentRow) != 0):
+            doctorList.append(currentRow)
+        # print(firstName)
+        # print(lastName)
+        # print(address)
+        # print(phone)
+        # print('=============')
+    writer.writerows(doctorList)
+
+print(doctorList)
