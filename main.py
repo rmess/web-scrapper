@@ -42,7 +42,8 @@ soup = BeautifulSoup(page.content, 'html.parser')
 
 # print(soup)
 nameAddress = soup.find_all('div', class_="item-professionnel")
-doctorList = []
+oldDoctorList = []
+newDoctorList = []
 # doctorList.append(["Nom", "Prénom", "Addresse", "Téléphone"])
 
 
@@ -52,13 +53,13 @@ with open('doctorDb.csv','r') as file:
     reader = csv.DictReader(file)
     for row in reader:
         # print(row)
-        doctorList.append(row)
-print("fin")
-print(doctorList)
+        oldDoctorList.append(row)
+print("/////////////////")
+print(oldDoctorList)
+print("///////////////")
 
 with open('doctorDb.csv', 'a+') as file:
     writer = csv.writer(file)
-    print(doctorList)
     for e in nameAddress:
         print('=============')
         e.div.unwrap()
@@ -69,13 +70,16 @@ with open('doctorDb.csv', 'a+') as file:
         address = res.get('div').get('div')[2].get('div').pop(6).get('#text') or "Null"
         phone = res.get('div').get('div')[2].get('div').pop(3).get('#text') or "Null"
         currentRow = [firstName, lastName, address, phone]
-        if (doctorList.count(currentRow) != 0):
-            doctorList.append(currentRow)
+        # print(currentRow)
+        # print(oldDoctorList.count(currentRow))
+        if (currentRow in oldDoctorList):
+            newDoctorList.append(currentRow)
         # print(firstName)
         # print(lastName)
         # print(address)
         # print(phone)
         # print('=============')
-    writer.writerows(doctorList)
+    # writer.writerows(oldDoctorList)
+    writer.writerows(newDoctorList)
 
-print(doctorList)
+# print(newDoctorList)
