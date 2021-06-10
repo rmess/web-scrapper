@@ -26,7 +26,7 @@ def extract_number_of_doctors(soup):
     """
     p = re.compile(u"(\d+) résultat[s]* correspond[ent]* à votre recherche")
 
-    tags = soup.find_all(name="h1")
+    tags = soup.find_all(name="p")
     for tag in tags:
         if tag.string is not None:
             res = p.findall(tag.string)
@@ -75,7 +75,8 @@ def make_single_query(specialty, location):
 
     # extract information
     soup = BeautifulSoup(r.text, 'html.parser')
-    number_of_doctors = 743
+    number_of_doctors = extract_number_of_doctors(soup)
+
     if number_of_doctors == 0:
         return None
     # loop over needed pages
@@ -87,18 +88,11 @@ def make_single_query(specialty, location):
         doctors = soup.findAll('div', attrs={"class":"item-professionnel"})
         dfs.append(pd.DataFrame([extract_information(doc) for doc in doctors], 
                  columns=['Nom', u'Adresse', u"Téléphone", u"Honoraires", "Convention"]))
-        # print([extract_information(doc) for doc in doctors])
 
     df = pd.concat(dfs, ignore_index=True)
     df.insert(0, u'Specialité', specialty)
     df.insert(1, 'Commune', pd.Series([location] * df.shape[0], index=df.index))
-    # print(df)
-    # df.append(read_csv('doctor2.csv'))
-    # df_clean = df
-    # print(df_clean)
-    # df_clean.drop_duplicates(subset = "Adresse", keep=False, inplace=True)
-    df.to_csv('doctor.csv', mode='a', header=False, encoding='utf_16')
-    # df_clean.to_csv('doctor2.csv', mode='a', header=True)
+    # df.to_csv('doctor.csv', mode='a', header=False, encoding='utf_16')
     return
 
 
