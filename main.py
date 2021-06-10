@@ -6,6 +6,8 @@ import math
 
 AMELI_URL = 'http://annuairesante.ameli.fr'
 
+C = 0
+
 def extract_information(block):
     """
     returns name, address, phone, prices and convention from
@@ -15,7 +17,7 @@ def extract_information(block):
     name = block.find('h2')
     address = block.find("div", attrs={'class':"item left adresse"})
     phone = block.find("div", attrs={'class':"item left tel"})
-
+ 
     for item in [name, address, phone or None]:
         if phone is not None:
             result.append(item.get_text())
@@ -71,12 +73,15 @@ def make_single_query(specialty, location):
         "User-Agent":"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.71 Safari/537.36"
         }
 
-    # sexe should be an argument of the function
+    # sexe should be an argument of the function 0=male 1=female 2=undifined
+    # localisation can be "villes" or "departements"
+    # ps_proximite: on
     payload = {
         "type":"ps",
         "ps_profession": specialty,
         "ps_localisation": location,
-        "ps_sexe": 2,
+        "ps_sexe": 1,
+        "localisation_category": 'departements'
         }
     r = s.post(AMELI_URL + suburl, params=payload,
           headers=headers)
@@ -101,7 +106,8 @@ def make_single_query(specialty, location):
     
 
     df = pd.concat(dfs, ignore_index=True)
-    df.to_csv('doctor.csv', mode='w+', header=False, encoding='utf_16')
+    # df.to_csv('doctor.csv', mode='w+', header=True, encoding='utf_16')
+    df.to_csv('doctor.csv', mode='a', header=False, encoding='utf_16')
     return df
 
 
@@ -113,4 +119,4 @@ def write_csv(data):
     return
 
 if __name__ == "__main__":
-    make_multiple_query('34',["TOULOUSE (31)"])
+    make_multiple_query('34',["HAUTE GARONNE (31)"])
