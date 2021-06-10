@@ -11,12 +11,24 @@ def extract_information(block):
     returns name, address, phone, prices and convention from
     a doctor html block
     """
+    result = []
     name = block.find('h2')
     address = block.find("div", attrs={'class':"item left adresse"})
     phone = block.find("div", attrs={'class':"item left tel"})
     prices = block.find("div", attrs={'class':"item right type_honoraires"})
     convention = block.find("div", attrs={'class':"item right convention"})
-    return [item.get_text(' ') if item is not None else '' for item in [name, address, phone, prices, convention]]
+    for item in [name, address, phone or None, prices, convention]:
+        if phone is not None:
+            result.append(item.get_text())
+            # print(result)
+    
+    if(len(result) > 0):
+        return result
+    return None
+    # print(result)
+    # for i in result:
+    #     print(i)
+    # return [item.get_text(' ') if item is not None else '' for item in [name, address, phone or None, prices, convention]]
 
 
 def extract_number_of_doctors(soup):
@@ -81,18 +93,26 @@ def make_single_query(specialty, location):
         return None
     # loop over needed pages
     dfs = []
+    test = []
+
     for pagenumber in range(1, int(math.ceil(number_of_doctors / 20.)) + 1):
         r2 = s.post(r.url.replace("liste-resultats-page-1-par_page-20-tri-aleatoire", 
                                   "liste-resultats-page-{}-par_page-20-tri-aleatoire").format(pagenumber))
         soup = BeautifulSoup(r2.text, 'html.parser')
         doctors = soup.findAll('div', attrs={"class":"item-professionnel"})
-        dfs.append(pd.DataFrame([extract_information(doc) for doc in doctors], 
-                 columns=['Nom', u'Adresse', u"Téléphone", u"Honoraires", "Convention"]))
-
+        # dfs.append(pd.DataFrame([extract_information(doc) for doc in doctors], 
+        #          columns=['Nom', u'Adresse', u"Téléphone", u"Honoraires", "Convention"]))
+        for doc in doctors:
+            if extract_information(doc) is not None:
+                dfs.append(pd.DataFrame([extract_information(doc)], columns=['Nom', u'Adresse', u"Téléphone", u"Honoraires", "Convention"]))
+        # test.append(pd.DataFrame([extract_information(doc) for doc in doctors], 
+        #          columns=['Nom', u'Adresse', u"Téléphone", u"Honoraires", "Convention"]).dropna(axis='index'))
+    
+    # print(test)
     df = pd.concat(dfs, ignore_index=True)
-    df.insert(0, u'Specialité', specialty)
-    df.insert(1, 'Commune', pd.Series([location] * df.shape[0], index=df.index))
-    # df.to_csv('doctor.csv', mode='a', header=False, encoding='utf_16')
+    # df.insert(0, u'Specialité', specialty)
+    # df.insert(1, 'Commune', pd.Series([location] * df.shape[0], index=df.index))
+    df.to_csv('doctor.csv', mode='w+', header=True, encoding='utf_16')
     return
 
 
