@@ -15,20 +15,16 @@ def extract_information(block):
     name = block.find('h2')
     address = block.find("div", attrs={'class':"item left adresse"})
     phone = block.find("div", attrs={'class':"item left tel"})
-    prices = block.find("div", attrs={'class':"item right type_honoraires"})
-    convention = block.find("div", attrs={'class':"item right convention"})
-    for item in [name, address, phone or None, prices, convention]:
+    # prices = block.find("div", attrs={'class':"item right type_honoraires"})
+    # convention = block.find("div", attrs={'class':"item right convention"})
+
+    for item in [name, address, phone or None]:
         if phone is not None:
             result.append(item.get_text())
-            # print(result)
     
     if(len(result) > 0):
         return result
     return None
-    # print(result)
-    # for i in result:
-    #     print(i)
-    # return [item.get_text(' ') if item is not None else '' for item in [name, address, phone or None, prices, convention]]
 
 
 def extract_number_of_doctors(soup):
@@ -104,7 +100,7 @@ def make_single_query(specialty, location):
         #          columns=['Nom', u'Adresse', u"Téléphone", u"Honoraires", "Convention"]))
         for doc in doctors:
             if extract_information(doc) is not None:
-                dfs.append(pd.DataFrame([extract_information(doc)], columns=['Nom', u'Adresse', u"Téléphone", u"Honoraires", "Convention"]))
+                dfs.append(pd.DataFrame([extract_information(doc)], columns=['Nom', u'Adresse', u"Téléphone"]))
         # test.append(pd.DataFrame([extract_information(doc) for doc in doctors], 
         #          columns=['Nom', u'Adresse', u"Téléphone", u"Honoraires", "Convention"]).dropna(axis='index'))
     
