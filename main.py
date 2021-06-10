@@ -1,6 +1,7 @@
 import requests
 import re
 from bs4 import BeautifulSoup
+import pandas as pd
 import math
 
 AMELI_URL = 'http://annuairesante.ameli.fr'
@@ -16,6 +17,7 @@ def extract_information(block):
     prices = block.find("div", attrs={'class':"item right type_honoraires"})
     convention = block.find("div", attrs={'class':"item right convention"})
     return [item.get_text(' ') if item is not None else '' for item in [name, address, phone, prices, convention]]
+
 
 def extract_number_of_doctors(soup):
     """
@@ -59,16 +61,21 @@ def make_single_query(specialty, location):
     
 
     # make the request
-    headers = {"User-Agent":"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.71 Safari/537.36"}
-    payload = {"type":"ps",
+    headers = {
+        "User-Agent":"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.71 Safari/537.36"
+        }
+    payload = {
+        "type":"ps",
         "ps_profession":specialty,
-        "ps_localisation":location}
+        "ps_localisation":location,
+        "ps_sexe": 0,
+        }
     r = s.post(AMELI_URL + suburl, params=payload,
           headers=headers)
 
     # extract information
     soup = BeautifulSoup(r.text, 'html.parser')
-    number_of_doctors = 1000
+    number_of_doctors = 743
     if number_of_doctors == 0:
         return None
     # loop over needed pages
@@ -78,15 +85,29 @@ def make_single_query(specialty, location):
                                   "liste-resultats-page-{}-par_page-20-tri-aleatoire").format(pagenumber))
         soup = BeautifulSoup(r2.text, 'html.parser')
         doctors = soup.findAll('div', attrs={"class":"item-professionnel"})
-        # dfs.append(pd.DataFrame([extract_information(doc) for doc in doctors], 
-        #          columns=['Nom', u'Adresse', u"Téléphone", u"Honoraires", "Convention"]))
-        print([extract_information(doc) for doc in doctors])
-    # df = pd.concat(dfs, ignore_index=True)
-    # df.insert(0, u'Specialité', specialty)
-    # df.insert(1, 'Commune', pd.Series([location] * df.shape[0], index=df.index))
-    print("je suis en vie")
-    # write data in csv
-    return 
+        dfs.append(pd.DataFrame([extract_information(doc) for doc in doctors], 
+                 columns=['Nom', u'Adresse', u"Téléphone", u"Honoraires", "Convention"]))
+        # print([extract_information(doc) for doc in doctors])
+
+    df = pd.concat(dfs, ignore_index=True)
+    df.insert(0, u'Specialité', specialty)
+    df.insert(1, 'Commune', pd.Series([location] * df.shape[0], index=df.index))
+    # print(df)
+    # df.append(read_csv('doctor2.csv'))
+    # df_clean = df
+    # print(df_clean)
+    # df_clean.drop_duplicates(subset = "Adresse", keep=False, inplace=True)
+    df.to_csv('doctor.csv', mode='a', header=False, encoding='utf_16')
+    # df_clean.to_csv('doctor2.csv', mode='a', header=True)
+    return
+
+
+def read_csv(file):
+    df = pd.read_csv(file)
+    return df
+
+def write_csv(data):
+    return
 
 if __name__ == "__main__":
-    make_multiple_query('médecin généraliste',["34000"])
+    make_multiple_query('34',["HERAULT (34)"])
