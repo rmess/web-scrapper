@@ -15,8 +15,6 @@ def extract_information(block):
     name = block.find('h2')
     address = block.find("div", attrs={'class':"item left adresse"})
     phone = block.find("div", attrs={'class':"item left tel"})
-    # prices = block.find("div", attrs={'class':"item right type_honoraires"})
-    # convention = block.find("div", attrs={'class':"item right convention"})
 
     for item in [name, address, phone or None]:
         if phone is not None:
@@ -72,11 +70,13 @@ def make_single_query(specialty, location):
     headers = {
         "User-Agent":"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.71 Safari/537.36"
         }
+
+    # sexe should be an argument of the function
     payload = {
         "type":"ps",
-        "ps_profession":specialty,
-        "ps_localisation":location,
-        "ps_sexe": 0,
+        "ps_profession": specialty,
+        "ps_localisation": location,
+        "ps_sexe": 2,
         }
     r = s.post(AMELI_URL + suburl, params=payload,
           headers=headers)
@@ -84,32 +84,25 @@ def make_single_query(specialty, location):
     # extract information
     soup = BeautifulSoup(r.text, 'html.parser')
     number_of_doctors = extract_number_of_doctors(soup)
-
+    print(number_of_doctors)
     if number_of_doctors == 0:
         return None
     # loop over needed pages
     dfs = []
-    test = []
 
     for pagenumber in range(1, int(math.ceil(number_of_doctors / 20.)) + 1):
         r2 = s.post(r.url.replace("liste-resultats-page-1-par_page-20-tri-aleatoire", 
                                   "liste-resultats-page-{}-par_page-20-tri-aleatoire").format(pagenumber))
         soup = BeautifulSoup(r2.text, 'html.parser')
         doctors = soup.findAll('div', attrs={"class":"item-professionnel"})
-        # dfs.append(pd.DataFrame([extract_information(doc) for doc in doctors], 
-        #          columns=['Nom', u'Adresse', u"Téléphone", u"Honoraires", "Convention"]))
         for doc in doctors:
             if extract_information(doc) is not None:
                 dfs.append(pd.DataFrame([extract_information(doc)], columns=['Nom', u'Adresse', u"Téléphone"]))
-        # test.append(pd.DataFrame([extract_information(doc) for doc in doctors], 
-        #          columns=['Nom', u'Adresse', u"Téléphone", u"Honoraires", "Convention"]).dropna(axis='index'))
     
-    # print(test)
+
     df = pd.concat(dfs, ignore_index=True)
-    # df.insert(0, u'Specialité', specialty)
-    # df.insert(1, 'Commune', pd.Series([location] * df.shape[0], index=df.index))
-    df.to_csv('doctor.csv', mode='w+', header=True, encoding='utf_16')
-    return
+    df.to_csv('doctor.csv', mode='w+', header=False, encoding='utf_16')
+    return df
 
 
 def read_csv(file):
@@ -120,4 +113,4 @@ def write_csv(data):
     return
 
 if __name__ == "__main__":
-    make_multiple_query('34',["HERAULT (34)"])
+    make_multiple_query('34',["TOULOUSE (31)"])
