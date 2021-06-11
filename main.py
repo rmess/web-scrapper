@@ -6,8 +6,6 @@ import math
 
 AMELI_URL = 'http://annuairesante.ameli.fr'
 
-C = 0
-
 def extract_information(block):
     """
     returns name, address, phone, prices and convention from
@@ -42,20 +40,20 @@ def extract_number_of_doctors(soup):
                 return int(p.findall(tag.string)[0])
     return 0
 
-def make_multiple_query(specialty, locations):
+def make_multiple_query(specialty, locations, sexe, localisation_category):
     """
     queries Ameli for a given specialty of doctors in locations, which is a list
     of postcodes
     """
     dfs = []
     for location in locations:
-        df = make_single_query(specialty, location)
+        df = make_single_query(specialty, location, sexe, localisation_category)
         if df is not None:
             dfs.append(df)
         
     return True
 
-def make_single_query(specialty, location):
+def make_single_query(specialty, location, sexe, localisation_category):
     """queries Ameli for a given specialty of doctors in a given location
     returns a pandas dataframe or None if no doctors have been found"""
     
@@ -80,8 +78,8 @@ def make_single_query(specialty, location):
         "type":"ps",
         "ps_profession": specialty,
         "ps_localisation": location,
-        "ps_sexe": 1,
-        "localisation_category": 'departements'
+        "ps_sexe": sexe,
+        "localisation_category": localisation_category
         }
     r = s.post(AMELI_URL + suburl, params=payload,
           headers=headers)
@@ -106,8 +104,8 @@ def make_single_query(specialty, location):
     
 
     df = pd.concat(dfs, ignore_index=True)
-    # df.to_csv('doctor.csv', mode='w+', header=True, encoding='utf_16')
-    df.to_csv('doctor.csv', mode='a', header=False, encoding='utf_16')
+    df.to_csv('doctors.csv', mode='w+', header=True, encoding='utf_16')
+    # df.to_csv('doctors.csv', mode='a', header=False, encoding='utf_16')
     return df
 
 
@@ -119,4 +117,4 @@ def write_csv(data):
     return
 
 if __name__ == "__main__":
-    make_multiple_query('34',["HAUTE GARONNE (31)"])
+    make_multiple_query('53',["HAUTE GARONNE (31)"], 2, 'departements')
