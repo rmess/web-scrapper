@@ -3,6 +3,7 @@ import re
 from bs4 import BeautifulSoup
 import pandas as pd
 import math
+from tkinter import *
 
 AMELI_URL = 'http://annuairesante.ameli.fr'
 
@@ -117,4 +118,44 @@ def write_csv(data):
     return
 
 if __name__ == "__main__":
-    make_multiple_query('53',["HAUTE GARONNE (31)"], 2, 'departements')
+    root = Tk()
+
+    labelDpt = Label(root, text="Département")
+    labelDpt.pack()
+    valueDpt = StringVar() 
+    valueDpt.set("Département")
+    entreeDpt = Entry(root, textvariable=str, width=30)
+    entreeDpt.pack()
+
+
+    genderBtn = StringVar() 
+    bouton1 = Radiobutton(root, text="Homme", variable=genderBtn, value=1)
+    bouton2 = Radiobutton(root, text="Femme", variable=genderBtn, value=2)
+    bouton3 = Radiobutton(root, text="Les deux", variable=genderBtn, value=3)
+    bouton1.pack()
+    bouton2.pack()
+    bouton3.pack()
+
+
+
+    def recupere():
+        dpt = entreeDpt.get()
+        gender = int(genderBtn.get())
+        v = entree.get()
+        print(dpt)
+        print(v)
+        print(gender)
+        make_multiple_query('34',["CHARENTE MARITIME (17)"], 2, 'departements')
+        root.destroy()
+
+
+    value = StringVar() 
+    value.set("Valeur")
+    entree = Entry(root, textvariable=value, width=30)
+    entree.pack()
+
+    bouton = Button(root, text="Valider", command=recupere)
+    bouton.pack()
+
+
+    root.mainloop()
