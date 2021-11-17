@@ -120,39 +120,56 @@ def write_csv(data):
 if __name__ == "__main__":
     root = Tk()
 
-    labelDpt = Label(root, text="Département")
-    labelDpt.pack()
-    valueDpt = StringVar() 
-    valueDpt.set("Département")
-    entreeDpt = Entry(root, textvariable=str, width=30)
-    entreeDpt.pack()
-
-
-    genderBtn = StringVar() 
-    bouton1 = Radiobutton(root, text="Homme", variable=genderBtn, value=1)
-    bouton2 = Radiobutton(root, text="Femme", variable=genderBtn, value=2)
-    bouton3 = Radiobutton(root, text="Les deux", variable=genderBtn, value=3)
-    bouton1.pack()
-    bouton2.pack()
-    bouton3.pack()
-
-
+    areaLbl = Label(root, text="Sexe")
+    areaLbl.pack()
+    genderValue = StringVar() 
+    maleBtn = Radiobutton(root, text="Homme", variable=genderValue, value=0)
+    femaleBtn = Radiobutton(root, text="Femme", variable=genderValue, value=1)
+    undefgenderValue = Radiobutton(root, text="Indiférent", variable=genderValue, value=2)
+    maleBtn.pack()
+    femaleBtn.pack()
+    undefgenderValue.pack()
 
     def recupere():
-        dpt = entreeDpt.get()
-        gender = int(genderBtn.get())
-        v = entree.get()
-        print(dpt)
-        print(v)
+        gender = int(genderValue.get())
+        areaInput = adressInput.get()
+        area = areaValue.get()
+        speciality = specialityValue.get()
+        print(areaInput)
+        print(area)
         print(gender)
-        make_multiple_query('34',["CHARENTE MARITIME (17)"], 2, 'departements')
+        print(speciality)
+        #1st select the doctor's speciality setted to généraliste for now
+        # sexe should be an argument of the function 0=male 1=female 2=undifined
+        # localisation can be "villes" or "departements"
+        # make_single_query(specialty, location, sexe, localisation_category):
+        make_multiple_query(speciality,[areaInput], gender, area)
         root.destroy()
 
 
-    value = StringVar() 
-    value.set("Valeur")
-    entree = Entry(root, textvariable=value, width=30)
-    entree.pack()
+
+    areaLbl = Label(root, text="Zone")
+    areaLbl.pack()
+    areaValue = StringVar()
+    cityBtn = Radiobutton(root, text="Villes", variable=areaValue, value="villes")
+    areaBtn = Radiobutton(root, text="Départements", variable=areaValue, value="departements")
+    cityBtn.pack()
+    areaBtn.pack()
+
+    areaLbl = Label(root, text="Profession")
+    areaLbl.pack()
+    specialityValue = StringVar() 
+    specialityValue.set("34")
+    specialityInput = Entry(root, textvariable=specialityValue, width=30)
+    specialityInput.pack()
+
+
+    areaLbl = Label(root, text="Adresse")
+    areaLbl.pack()
+    adressValue = StringVar() 
+    adressValue.set("HERAULT (34)")
+    adressInput = Entry(root, textvariable=adressValue, width=30)
+    adressInput.pack()
 
     bouton = Button(root, text="Valider", command=recupere)
     bouton.pack()
