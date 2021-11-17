@@ -132,10 +132,10 @@ if __name__ == "__main__":
 
     def recupere():
         gender = int(genderValue.get())
-        areaInput = adressInput.get()
+        adress = adressInput.get()
         area = areaValue.get()
         speciality = specialityValue.get()
-        print(areaInput)
+        print(adress)
         print(area)
         print(gender)
         print(speciality)
@@ -143,7 +143,7 @@ if __name__ == "__main__":
         # sexe should be an argument of the function 0=male 1=female 2=undifined
         # localisation can be "villes" or "departements"
         # make_single_query(specialty, location, sexe, localisation_category):
-        make_multiple_query(speciality,[areaInput], gender, area)
+        make_multiple_query(speciality,[adress], gender, area)
         root.destroy()
 
 
